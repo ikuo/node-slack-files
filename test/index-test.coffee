@@ -13,6 +13,22 @@ describe 'slack-files', ->
             .catch(Error, (err) -> err.message)
         ).to.eventually.equal("form-data: ENOENT, open './test/fixtures/missing-file.text'")
 
+    context 'with invalid token', ->
+      beforeEach ->
+        nock('https://slack.com:443')
+          .filteringRequestBody((body) -> '*')
+          .post('/api/files.upload', '*')
+          .replyWithFile(200, "#{__dirname}/fixtures/upload-ng-auth.json")
+
+      it 'returns error', ->
+        file = './test/fixtures/sample.txt'
+        expect(
+          files.upload(token, file)
+            .spread((response, body) -> body)
+        )
+        .to.eventually.deep
+        .equal(ok: false, error: 'invalid_auth')
+
     context 'with valid local path', ->
       beforeEach ->
         nock('https://slack.com:443')
