@@ -18,7 +18,7 @@ npm install slack-files --save
 ```javascript
 var slack = require('slack-files');
 slack.upload('xoxp-aaaaaaaaaa-bbbbbbbbbb-ccccccccccc-dddddddddd', 'sample.txt')
-  .spread(function (response, body) { console.log(body) });
+  .spread(function (response, body) { console.log(body.file.url) });
 ```
 
 See more examples in [./test/*.coffee](./test)
