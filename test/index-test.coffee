@@ -17,7 +17,7 @@ describe 'slack-files', ->
         expect(
           files.upload(token, file)
             .catch(Error, (err) -> err.message)
-        ).to.eventually.equal("form-data: ENOENT, open './test/fixtures/missing-file.text'")
+        ).to.eventually.match(/ENOENT/)
 
     context 'with invalid token', ->
       beforeEach -> mockHttp('ng-auth')
