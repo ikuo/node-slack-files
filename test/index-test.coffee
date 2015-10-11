@@ -5,6 +5,12 @@ nock = require('nock')
 describe 'slack-files', ->
   token = 'xoxp-aaaaaaaaaa-bbbbbbbbbb-ccccccccccc-dddddddddd'
   context '#upload', ->
+    mockHttp = (key) ->
+      nock('https://slack.com:443')
+        .filteringRequestBody((body) -> '*')
+        .post('/api/files.upload', '*')
+        .replyWithFile(200, "#{__dirname}/fixtures/upload-#{key}.json")
+
     context 'with non-existent local path', ->
       it 'returns error', ->
         file = './test/fixtures/missing-file.text'
@@ -14,11 +20,7 @@ describe 'slack-files', ->
         ).to.eventually.equal("form-data: ENOENT, open './test/fixtures/missing-file.text'")
 
     context 'with invalid token', ->
-      beforeEach ->
-        nock('https://slack.com:443')
-          .filteringRequestBody((body) -> '*')
-          .post('/api/files.upload', '*')
-          .replyWithFile(200, "#{__dirname}/fixtures/upload-ng-auth.json")
+      beforeEach -> mockHttp('ng-auth')
 
       it 'returns error', ->
         file = './test/fixtures/sample.txt'
@@ -30,11 +32,7 @@ describe 'slack-files', ->
         .equal(ok: false, error: 'invalid_auth')
 
     context 'with valid local path', ->
-      beforeEach ->
-        nock('https://slack.com:443')
-          .filteringRequestBody((body) -> '*')
-          .post('/api/files.upload', '*')
-          .replyWithFile(200, "#{__dirname}/fixtures/upload-ok.json")
+      beforeEach -> mockHttp('ok')
 
       it 'uploads the file', ->
         file = './test/fixtures/sample.txt'
